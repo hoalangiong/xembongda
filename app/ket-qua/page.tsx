@@ -1,67 +1,16 @@
-"use client";
+import type { Metadata } from "next";
+import KetQuaContent from "@/components/KetQuaContent";
 
-import { useState, useEffect } from "react";
-import MatchCard from "@/components/MatchCard";
-import LeagueFilter from "@/components/LeagueFilter";
-import { apiUrl } from "@/lib/utils";
+export const metadata: Metadata = {
+  title: "Kết quả bóng đá mới nhất | XemBongDa",
+  description:
+    "Kết quả bóng đá mới nhất các giải Ngoại hạng Anh, La Liga, Bundesliga, Serie A, Champions League, World Cup.",
+  openGraph: {
+    title: "Kết quả bóng đá mới nhất | XemBongDa",
+    description: "Tỷ số và kết quả trận đấu bóng đá hôm nay và hôm qua.",
+  },
+};
 
 export default function KetQuaPage() {
-  const [fixtures, setFixtures] = useState<any[]>([]);
-  const [selectedLeague, setSelectedLeague] = useState<number | null>(null);
-  const [date, setDate] = useState(() => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split("T")[0];
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({ date });
-        if (selectedLeague) params.set("league", String(selectedLeague));
-        const res = await fetch(apiUrl(`/api/fixtures?${params}`));
-        const data = await res.json();
-        // Chỉ lấy trận đã kết thúc
-        const finished = (data.data || []).filter(
-          (f: any) => f.fixture.status.short === "FT"
-        );
-        setFixtures(finished);
-      } catch {
-        setFixtures([]);
-      }
-      setLoading(false);
-    }
-    fetchData();
-  }, [date, selectedLeague]);
-
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">📊 Kết quả</h1>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white"
-        />
-      </div>
-
-      <LeagueFilter selected={selectedLeague} onChange={setSelectedLeague} />
-
-      {loading ? (
-        <p className="text-gray-400">Đang tải...</p>
-      ) : fixtures.length === 0 ? (
-        <p className="text-gray-400">Không có kết quả nào trong ngày này.</p>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {fixtures.map((f: any) => (
-            <MatchCard key={f.fixture.id} fixture={f} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <KetQuaContent />;
 }
