@@ -16,21 +16,22 @@ const streamSources: Record<string, StreamSource[]> = {
 };
 
 // Các nguồn stream mặc định (pattern-based)
+// Cập nhật URL khi có nguồn thực tế hoạt động
 const DEFAULT_SOURCES: Array<{ name: string; pattern: (homeTeam: string, awayTeam: string) => string }> = [
   {
-    name: "Xoilac TV",
+    name: "Tìm trên Google",
     pattern: (home, away) =>
-      `https://xoilac.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+      `https://www.google.com/search?igu=1&q=${encodeURIComponent(`${home} vs ${away} trực tiếp xem bóng đá`)}`,
   },
   {
-    name: "Cakhia TV",
+    name: "90Phut TV",
     pattern: (home, away) =>
-      `https://cakhia.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+      `https://90phut5.tv/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
   },
   {
-    name: "Vebo TV",
+    name: "Rakhoi TV",
     pattern: (home, away) =>
-      `https://vebo.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+      `https://rfrakhoi.com/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
   },
 ];
 
