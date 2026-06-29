@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getDefaultStreamSearch } from "@/lib/stream-sources";
 import { getSportSrcMatches, getSportSrcStreams, findSportSrcMatch } from "@/lib/sportsrc";
 import type { SportSrcStream } from "@/lib/sportsrc";
 import { apiUrl } from "@/lib/utils";
@@ -117,21 +116,8 @@ export default function TrucTiepPage() {
         ) : (
           <div className="flex flex-col items-center gap-4 py-8 text-center">
             <p className="text-gray-500 dark:text-gray-400">
-              {fixture ? "Chưa tìm thấy nguồn phát sóng cho trận này." : "Không tìm thấy trận đấu."}
+              {fixture ? "Trận chưa có link phát sóng. Vui lòng quay lại khi trận bắt đầu." : "Không tìm thấy trận đấu."}
             </p>
-            {fixture && (
-              <a
-                href={getDefaultStreamSearch(
-                  fixture.teams.home.name,
-                  fixture.teams.away.name
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
-              >
-                Tìm link xem trực tiếp
-              </a>
-            )}
           </div>
         )}
       </div>
