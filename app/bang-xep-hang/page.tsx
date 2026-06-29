@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { LEAGUES } from "@/lib/leagues";
 import StandingsTable from "@/components/StandingsTable";
+import { apiUrl } from "@/lib/utils";
 
 export default function BangXepHangPage() {
   const [selectedLeague, setSelectedLeague] = useState(LEAGUES[2].id); // Mặc định EPL
@@ -15,7 +16,7 @@ export default function BangXepHangPage() {
       try {
         const season = new Date().getFullYear();
         const res = await fetch(
-          `/api/standings?league=${selectedLeague}&season=${season}`
+          apiUrl(`/api/standings?league=${selectedLeague}&season=${season}`)
         );
         const data = await res.json();
         // API trả về array of league → lấy standings đầu tiên

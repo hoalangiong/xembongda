@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import MatchCard from "@/components/MatchCard";
 import LeagueFilter from "@/components/LeagueFilter";
+import { apiUrl } from "@/lib/utils";
 
 export default function LichThiDauPage() {
   const [fixtures, setFixtures] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function LichThiDauPage() {
       try {
         const params = new URLSearchParams({ date });
         if (selectedLeague) params.set("league", String(selectedLeague));
-        const res = await fetch(`/api/fixtures?${params}`);
+        const res = await fetch(apiUrl(`/api/fixtures?${params}`));
         const data = await res.json();
         setFixtures(data.data || []);
       } catch {

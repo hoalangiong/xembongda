@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import MatchCard from "@/components/MatchCard";
 import LeagueFilter from "@/components/LeagueFilter";
+import { apiUrl } from "@/lib/utils";
 
 export default function HomePage() {
   const [fixtures, setFixtures] = useState<any[]>([]);
@@ -15,8 +16,8 @@ export default function HomePage() {
       setLoading(true);
       try {
         const [fixturesRes, liveRes] = await Promise.all([
-          fetch(`/api/fixtures${selectedLeague ? `?league=${selectedLeague}` : ""}`),
-          fetch("/api/live"),
+          fetch(apiUrl(`/api/fixtures${selectedLeague ? `?league=${selectedLeague}` : ""}`)),
+          fetch(apiUrl("/api/live")),
         ]);
         const fixturesData = await fixturesRes.json();
         const liveData = await liveRes.json();
@@ -35,7 +36,7 @@ export default function HomePage() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("/api/live");
+        const res = await fetch(apiUrl("/api/live"));
         const data = await res.json();
         setLiveFixtures(data.data || []);
       } catch {

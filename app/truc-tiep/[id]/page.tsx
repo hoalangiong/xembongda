@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getStreamUrl, getDefaultStreamSearch } from "@/lib/stream-sources";
+import { apiUrl } from "@/lib/utils";
 
 export default function TrucTiepPage() {
   const params = useParams();
@@ -13,7 +14,7 @@ export default function TrucTiepPage() {
   useEffect(() => {
     async function fetchFixture() {
       try {
-        const res = await fetch(`/api/fixtures?live=true`);
+        const res = await fetch(apiUrl(`/api/fixtures?live=true`));
         const data = await res.json();
         const match = (data.data || []).find(
           (f: any) => String(f.fixture.id) === id
