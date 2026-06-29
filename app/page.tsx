@@ -19,7 +19,7 @@ export default function HomePage() {
         const [fixturesRes, liveRes, upcomingRes] = await Promise.all([
           fetch(apiUrl(`/api/fixtures${selectedLeague ? `?league=${selectedLeague}` : ""}`)),
           fetch(apiUrl("/api/live")),
-          fetch(apiUrl(`/api/fixtures?next=3&league=1`)), // World Cup 3 ngày tới
+          fetch(apiUrl("/api/worldcup")),
         ]);
         const fixturesData = await fixturesRes.json();
         const liveData = await liveRes.json();
