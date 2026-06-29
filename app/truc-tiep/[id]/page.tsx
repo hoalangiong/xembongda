@@ -2,40 +2,60 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getStreamSources, getDefaultStreamSearch } from "@/lib/stream-sources";
+import { getDefaultStreamSearch } from "@/lib/stream-sources";
+import { getSportSrcMatches, getSportSrcStreams, findSportSrcMatch } from "@/lib/sportsrc";
+import type { SportSrcStream } from "@/lib/sportsrc";
 import { apiUrl } from "@/lib/utils";
 
 export default function TrucTiepPage() {
   const params = useParams();
   const id = params.id as string;
   const [fixture, setFixture] = useState<any>(null);
+  const [streams, setStreams] = useState<SportSrcStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeSource, setActiveSource] = useState(0);
 
   useEffect(() => {
-    async function fetchFixture() {
+    async function fetchData() {
       try {
+        // 1. Lấy thông tin trận từ API-Football
         const res = await fetch(apiUrl(`/api/fixtures?live=true`));
         const data = await res.json();
         const match = (data.data || []).find(
           (f: any) => String(f.fixture.id) === id
         );
         setFixture(match || null);
+
+        // 2. Tìm stream từ SportSRC
+        if (match) {
+          const srcMatches = await getSportSrcMatches();
+          const srcMatch = findSportSrcMatch(
+            srcMatches,
+            match.teams.home.name,
+            match.teams.away.name
+          );
+          if (srcMatch) {
+            const srcStreams = await getSportSrcStreams(srcMatch.id);
+            // Lọc HD sources ưu tiên
+            const sorted = srcStreams.sort((a, b) => {
+              if (a.hd && !b.hd) return -1;
+              if (!a.hd && b.hd) return 1;
+              return a.streamNo - b.streamNo;
+            });
+            setStreams(sorted);
+          }
+        }
       } catch {
         setFixture(null);
       }
       setLoading(false);
     }
-    fetchFixture();
+    fetchData();
   }, [id]);
 
   if (loading) {
     return <p className="text-gray-400">Đang tải...</p>;
   }
-
-  const sources = fixture
-    ? getStreamSources(id, fixture.teams.home.name, fixture.teams.away.name)
-    : getStreamSources(id);
 
   return (
     <div className="space-y-6">
@@ -61,11 +81,11 @@ export default function TrucTiepPage() {
       <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
         <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">📺 Xem trực tiếp</h2>
 
-        {sources.length > 0 ? (
+        {streams.length > 0 ? (
           <>
             {/* Tabs chọn nguồn */}
             <div className="mb-3 flex flex-wrap gap-2">
-              {sources.map((src, i) => (
+              {streams.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveSource(i)}
@@ -75,7 +95,7 @@ export default function TrucTiepPage() {
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                   }`}
                 >
-                  {src.name}
+                  {src.hd ? "HD" : "SD"} {src.language} #{src.streamNo}
                 </button>
               ))}
             </div>
@@ -83,21 +103,21 @@ export default function TrucTiepPage() {
             {/* Iframe */}
             <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
               <iframe
-                src={sources[activeSource].url}
+                src={streams[activeSource].embedUrl}
                 className="h-full w-full"
                 allowFullScreen
                 allow="autoplay; encrypted-media"
-                title={`Stream - ${sources[activeSource].name}`}
+                title={`Stream #${streams[activeSource].streamNo}`}
               />
             </div>
             <p className="mt-2 text-xs text-gray-500">
-              💡 Nếu nguồn không hoạt động, hãy thử nguồn khác.
+              💡 Nếu nguồn không hoạt động, hãy thử nguồn khác. Ưu tiên HD.
             </p>
           </>
         ) : (
           <div className="flex flex-col items-center gap-4 py-8 text-center">
             <p className="text-gray-500 dark:text-gray-400">
-              Chưa có link phát sóng cho trận đấu này.
+              {fixture ? "Chưa tìm thấy nguồn phát sóng cho trận này." : "Không tìm thấy trận đấu."}
             </p>
             {fixture && (
               <a
