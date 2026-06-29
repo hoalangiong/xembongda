@@ -138,3 +138,53 @@ export async function getFixtureById(id: number) {
   setCache(cacheKey, data);
   return data;
 }
+
+export async function searchTeams(query: string) {
+  const cacheKey = `search-${query.toLowerCase()}`;
+  const cached = getCached(cacheKey, CACHE_TTL.fixtures);
+  if (cached) return cached;
+
+  const data = await apiFetch("/teams", { search: query });
+  setCache(cacheKey, data);
+  return data;
+}
+
+export async function getTeamInfo(id: number) {
+  const cacheKey = `team-${id}`;
+  const cached = getCached(cacheKey, CACHE_TTL.fixtures);
+  if (cached) return cached;
+
+  const data = await apiFetch("/teams", { id: String(id) });
+  setCache(cacheKey, data);
+  return data;
+}
+
+export async function getTeamFixtures(id: number, last: number = 5) {
+  const cacheKey = `team-fixtures-${id}-${last}`;
+  const cached = getCached(cacheKey, CACHE_TTL.fixtures);
+  if (cached) return cached;
+
+  const data = await apiFetch("/fixtures", { team: String(id), last: String(last) });
+  setCache(cacheKey, data);
+  return data;
+}
+
+export async function getTeamNextFixtures(id: number, next: number = 5) {
+  const cacheKey = `team-next-${id}-${next}`;
+  const cached = getCached(cacheKey, CACHE_TTL.fixtures);
+  if (cached) return cached;
+
+  const data = await apiFetch("/fixtures", { team: String(id), next: String(next) });
+  setCache(cacheKey, data);
+  return data;
+}
+
+export async function getOdds(fixtureId: number) {
+  const cacheKey = `odds-${fixtureId}`;
+  const cached = getCached(cacheKey, CACHE_TTL.fixtures);
+  if (cached) return cached;
+
+  const data = await apiFetch("/odds", { fixture: String(fixtureId) });
+  setCache(cacheKey, data);
+  return data;
+}

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "./ThemeToggle";
+import SearchBar from "./SearchBar";
 
 const NAV_ITEMS = [
   { href: "/", label: "Trang chủ" },
@@ -14,11 +16,11 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-900/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl">⚽</span>
-          <span className="text-lg font-bold text-white">XemBongDa</span>
+          <span className="text-lg font-bold text-gray-900 dark:text-white">XemBongDa</span>
         </Link>
 
         <nav className="flex items-center gap-1">
@@ -26,15 +28,17 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+              className={`hidden rounded-lg px-3 py-2 text-sm font-medium transition sm:block ${
                 pathname === item.href
-                  ? "bg-green-600/20 text-green-400"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  ? "bg-green-600/20 text-green-600 dark:text-green-400"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               }`}
             >
               {item.label}
             </Link>
           ))}
+          <SearchBar />
+          <ThemeToggle />
         </nav>
       </div>
     </header>

@@ -6,6 +6,7 @@ import { apiUrl } from "@/lib/utils";
 import MatchTimeline from "./MatchTimeline";
 import MatchStats from "./MatchStats";
 import MatchLineup from "./MatchLineup";
+import MatchOdds from "./MatchOdds";
 
 export default function MatchDetail() {
   const params = useParams();
@@ -86,6 +87,9 @@ export default function MatchDetail() {
           <p className="text-xs text-gray-500">📍 {fixture.venue.name}, {fixture.venue.city}</p>
         )}
       </div>
+
+      {/* Tỷ lệ kèo */}
+      <MatchOdds fixtureId={fixture.id} />
 
       {/* Timeline sự kiện */}
       {events && events.length > 0 && (

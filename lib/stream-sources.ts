@@ -1,21 +1,56 @@
-// Map fixture ID → iframe stream URL
+// Map fixture ID → array of stream sources
 // Cập nhật thủ công hoặc qua admin panel sau này
 
-interface StreamSource {
+export interface StreamSource {
   url: string;
   name: string;
 }
 
-const streamSources: Record<string, StreamSource> = {
+// Nguồn stream theo fixture ID (thêm thủ công)
+const streamSources: Record<string, StreamSource[]> = {
   // Ví dụ:
-  // "1234567": { url: "https://example.com/embed/stream1", name: "Nguồn 1" },
+  // "1234567": [
+  //   { url: "https://example.com/embed/stream1", name: "Nguồn 1" },
+  //   { url: "https://example2.com/embed/stream2", name: "Nguồn 2" },
+  // ],
 };
 
-export function getStreamUrl(fixtureId: string | number): StreamSource | null {
-  return streamSources[String(fixtureId)] || null;
+// Các nguồn stream mặc định (pattern-based)
+const DEFAULT_SOURCES: Array<{ name: string; pattern: (homeTeam: string, awayTeam: string) => string }> = [
+  {
+    name: "Xoilac TV",
+    pattern: (home, away) =>
+      `https://xoilac.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+  },
+  {
+    name: "Cakhia TV",
+    pattern: (home, away) =>
+      `https://cakhia.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+  },
+  {
+    name: "Vebo TV",
+    pattern: (home, away) =>
+      `https://vebo.ink/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+  },
+];
+
+export function getStreamSources(fixtureId: string | number, homeTeam?: string, awayTeam?: string): StreamSource[] {
+  // 1. Nguồn cố định theo fixture ID
+  const fixed = streamSources[String(fixtureId)];
+  if (fixed && fixed.length > 0) return fixed;
+
+  // 2. Nguồn pattern-based
+  if (homeTeam && awayTeam) {
+    return DEFAULT_SOURCES.map((src) => ({
+      name: src.name,
+      url: src.pattern(homeTeam, awayTeam),
+    }));
+  }
+
+  return [];
 }
 
-// Link stream mặc định dựa trên tên trận (fallback)
+// Link tìm kiếm fallback
 export function getDefaultStreamSearch(homeTeam: string, awayTeam: string): string {
   const query = encodeURIComponent(`${homeTeam} vs ${awayTeam} trực tiếp`);
   return `https://www.google.com/search?q=${query}`;

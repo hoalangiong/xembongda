@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark">
-      <body className="min-h-screen bg-gray-950 text-white antialiased">
+    <html lang="vi" className="dark" suppressHydrationWarning>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-white">
         <Header />
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
         <Footer />
