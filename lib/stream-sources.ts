@@ -16,22 +16,18 @@ const streamSources: Record<string, StreamSource[]> = {
 };
 
 // Các nguồn stream mặc định (pattern-based)
-// Cập nhật URL khi có nguồn thực tế hoạt động
+// Nguồn đầu tiên là Google search (luôn hoạt động)
+// Thêm nguồn thực tế khi có vào object streamSources phía trên
 const DEFAULT_SOURCES: Array<{ name: string; pattern: (homeTeam: string, awayTeam: string) => string }> = [
   {
-    name: "Tìm trên Google",
+    name: "Tìm nguồn 1",
     pattern: (home, away) =>
-      `https://www.google.com/search?igu=1&q=${encodeURIComponent(`${home} vs ${away} trực tiếp xem bóng đá`)}`,
+      `https://www.google.com/search?igu=1&q=${encodeURIComponent(`${home} vs ${away} trực tiếp`)}`,
   },
   {
-    name: "90Phut TV",
+    name: "Tìm nguồn 2",
     pattern: (home, away) =>
-      `https://90phut5.tv/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
-  },
-  {
-    name: "Rakhoi TV",
-    pattern: (home, away) =>
-      `https://rfrakhoi.com/embed/${encodeURIComponent(`${home}-vs-${away}`.toLowerCase().replace(/\s+/g, "-"))}`,
+      `https://www.google.com/search?igu=1&q=${encodeURIComponent(`${home} vs ${away} live stream free`)}`,
   },
 ];
 
