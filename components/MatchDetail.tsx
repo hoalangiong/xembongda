@@ -89,7 +89,7 @@ export default function MatchDetail() {
       </div>
 
       {/* Tỷ lệ kèo */}
-      <MatchOdds fixtureId={fixture.id} />
+      <MatchOdds fixtureId={fixture.id} homeTeam={teams.home.name} awayTeam={teams.away.name} />
 
       {/* Timeline sự kiện */}
       {events && events.length > 0 && (
