@@ -11,9 +11,10 @@ interface MatchOddsProps {
 
 // Nhà cái VN clone kèo SBOBET + affiliate links
 const VN_BOOKMAKERS = [
-  { name: "SC88", logo: "🔵", link: "https://www.sc88.com/?ref=xembongda" },
-  { name: "78Win", logo: "🔴", link: "https://78win.com/?ref=xembongda" },
-  { name: "X88", logo: "🟣", link: "https://x88.com/?ref=xembongda" },
+  { name: "XX88", logo: "🟡", link: "https://www.xx8811.com/m/index.html?affiliateCode=tinhtamcc" },
+  { name: "78Win", logo: "🔴", link: "https://www.78winc6.mobi/?uagt=lethituyethong&path=signup" },
+  { name: "MM88", logo: "🟠", link: "https://lethituyethong.mm88r.com/register.html" },
+  { name: "SC88", logo: "🔵", link: "https://www.sc887.vip/?id=264720333" },
 ];
 
 export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsProps) {
