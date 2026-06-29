@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFootballEvents, findMatchingEvent } from "@/lib/odds-api";
+import { findAndGetOdds } from "@/lib/odds-api";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,13 +11,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Cần tham số home và away" }, { status: 400 });
     }
 
-    const events = await getFootballEvents();
-    if (!events || events.length === 0) {
-      return NextResponse.json({ data: null });
-    }
-
-    const match = findMatchingEvent(events, home, away);
-    return NextResponse.json({ data: match });
+    const data = await findAndGetOdds(home, away);
+    return NextResponse.json({ data });
   } catch {
     return NextResponse.json({ error: "Đang cập nhật" }, { status: 500 });
   }

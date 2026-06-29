@@ -1,33 +1,19 @@
 // Odds-API.io - Real odds from SBOBET, M88
 // Free tier: 2 bookmakers, 100 requests/hour
+// API docs: https://odds-api.io
 
-const ODDS_API_BASE = "https://api.odds-api.io";
+const ODDS_API_BASE = "https://api.odds-api.io/v3";
 const ODDS_API_KEY = process.env.ODDS_API_KEY || "";
 
-export interface OddsMarket {
-  bookmaker: string;
-  market: string;
-  outcomes: Array<{
-    name: string;
-    price: number;
-    point?: number;
-  }>;
-}
-
-export interface MatchOddsData {
-  id: string;
-  homeTeam: string;
-  awayTeam: string;
-  markets: OddsMarket[];
-}
-
-// Lấy danh sách trận football có odds
-export async function getFootballEvents(): Promise<any[]> {
+// Lấy danh sách events football (có thể filter theo league)
+export async function getOddsEvents(league?: string): Promise<any[]> {
   try {
-    const res = await fetch(
-      `${ODDS_API_BASE}/v4/sports/soccer/odds?apiKey=${ODDS_API_KEY}&bookmakers=sbobet,m88&markets=spreads,totals,h2h&oddsFormat=decimal`,
-      { next: { revalidate: 300 } } // cache 5 phút
-    );
+    const params = new URLSearchParams({
+      sport: "football",
+      apiKey: ODDS_API_KEY,
+    });
+    if (league) params.set("league", league);
+    const res = await fetch(`${ODDS_API_BASE}/events?${params}`);
     if (!res.ok) return [];
     return await res.json();
   } catch {
@@ -35,13 +21,16 @@ export async function getFootballEvents(): Promise<any[]> {
   }
 }
 
-// Lấy odds cho 1 event cụ thể
-export async function getEventOdds(eventId: string): Promise<any | null> {
+// Lấy odds cho 1 event cụ thể từ SBOBET + M88
+export async function getEventOdds(eventId: number): Promise<any | null> {
   try {
-    const res = await fetch(
-      `${ODDS_API_BASE}/v4/sports/soccer/events/${eventId}/odds?apiKey=${ODDS_API_KEY}&bookmakers=sbobet,m88&markets=spreads,totals,h2h&oddsFormat=decimal`,
-      { next: { revalidate: 300 } }
-    );
+    const params = new URLSearchParams({
+      sport: "football",
+      eventId: String(eventId),
+      bookmakers: "Sbobet,M88",
+      apiKey: ODDS_API_KEY,
+    });
+    const res = await fetch(`${ODDS_API_BASE}/odds?${params}`);
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -54,16 +43,22 @@ function normalize(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-export function findMatchingEvent(events: any[], homeTeam: string, awayTeam: string): any | null {
+export async function findAndGetOdds(homeTeam: string, awayTeam: string): Promise<any | null> {
+  const events = await getOddsEvents();
+  if (!events || events.length === 0) return null;
+
   const homeNorm = normalize(homeTeam);
   const awayNorm = normalize(awayTeam);
 
-  return events.find((ev: any) => {
-    const h = normalize(ev.home_team || "");
-    const a = normalize(ev.away_team || "");
+  const match = events.find((ev: any) => {
+    const h = normalize(ev.home || "");
+    const a = normalize(ev.away || "");
     return (
       (h.includes(homeNorm) || homeNorm.includes(h)) &&
       (a.includes(awayNorm) || awayNorm.includes(a))
     );
-  }) || null;
+  });
+
+  if (!match) return null;
+  return getEventOdds(match.id);
 }
