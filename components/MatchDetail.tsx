@@ -12,14 +12,26 @@ export default function MatchDetail() {
   const params = useParams();
   const id = params.id as string;
   const [match, setMatch] = useState<any>(null);
+  const [wcMatch, setWcMatch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchMatch() {
       try {
+        // 1. Thử API-Football trước
         const res = await fetch(apiUrl(`/api/match/${id}`));
         const data = await res.json();
-        setMatch(data.data?.[0] || null);
+        if (data.data?.[0]) {
+          setMatch(data.data[0]);
+        } else {
+          // 2. Fallback: tìm trong World Cup (odds-api.io)
+          const wcRes = await fetch(apiUrl("/api/worldcup"));
+          const wcData = await wcRes.json();
+          const found = (wcData.data || []).find(
+            (f: any) => String(f.fixture.id) === id
+          );
+          if (found) setWcMatch(found);
+        }
       } catch {
         setMatch(null);
       }
@@ -30,6 +42,37 @@ export default function MatchDetail() {
 
   if (loading) {
     return <p className="text-gray-400">Đang tải...</p>;
+  }
+
+  // Fallback: World Cup match từ odds-api.io (chỉ có tên đội + kèo)
+  if (!match && wcMatch) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-lg bg-gray-100 p-6 text-center dark:bg-gray-800">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{wcMatch.league.name}</p>
+          <div className="mt-4 flex items-center justify-center gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-3xl">🏠</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.home.name}</span>
+            </div>
+            <div className="text-center">
+              <p className="text-xl text-gray-500">vs</p>
+              <p className="mt-1 text-xs text-gray-400">
+                {new Date(wcMatch.fixture.date).toLocaleDateString("vi-VN", {
+                  weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
+                })}
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-3xl">✈️</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.away.name}</span>
+            </div>
+          </div>
+        </div>
+
+        <MatchOdds fixtureId={wcMatch.fixture.id} homeTeam={wcMatch.teams.home.name} awayTeam={wcMatch.teams.away.name} />
+      </div>
+    );
   }
 
   if (!match) {
