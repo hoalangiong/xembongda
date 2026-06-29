@@ -7,6 +7,7 @@ import { apiUrl } from "@/lib/utils";
 
 export default function HomePage() {
   const [fixtures, setFixtures] = useState<any[]>([]);
+  const [upcomingFixtures, setUpcomingFixtures] = useState<any[]>([]);
   const [liveFixtures, setLiveFixtures] = useState<any[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -15,17 +16,25 @@ export default function HomePage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [fixturesRes, liveRes] = await Promise.all([
+        const [fixturesRes, liveRes, upcomingRes] = await Promise.all([
           fetch(apiUrl(`/api/fixtures${selectedLeague ? `?league=${selectedLeague}` : ""}`)),
           fetch(apiUrl("/api/live")),
+          fetch(apiUrl(`/api/fixtures?next=3&league=1`)), // World Cup 3 ngày tới
         ]);
         const fixturesData = await fixturesRes.json();
         const liveData = await liveRes.json();
+        const upcomingData = await upcomingRes.json();
         setFixtures(fixturesData.data || []);
         setLiveFixtures(liveData.data || []);
+        // Chỉ lấy trận chưa đá
+        const upcoming = (upcomingData.data || []).filter(
+          (f: any) => f.fixture.status.short === "NS" || f.fixture.status.short === "TBD"
+        );
+        setUpcomingFixtures(upcoming);
       } catch {
         setFixtures([]);
         setLiveFixtures([]);
+        setUpcomingFixtures([]);
       }
       setLoading(false);
     }
@@ -84,6 +93,17 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      {upcomingFixtures.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">🏆 World Cup — Sắp tới</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {upcomingFixtures.map((f: any) => (
+              <MatchCard key={f.fixture.id} fixture={f} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
