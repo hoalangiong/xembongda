@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import MatchCard from "@/components/MatchCard";
 import LeagueFilter from "@/components/LeagueFilter";
+import NewsFeed from "@/components/NewsFeed";
 import { apiUrl } from "@/lib/utils";
 
 export default function HomePage() {
@@ -104,6 +105,8 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      <NewsFeed />
     </div>
   );
 }
