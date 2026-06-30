@@ -53,12 +53,12 @@ export default function SearchBar() {
         type="text"
         value={query}
         onChange={(e) => handleChange(e.target.value)}
-        placeholder="Tìm đội bóng..."
-        className="w-36 rounded-lg border border-gray-300 bg-gray-100 px-3 py-1.5 text-sm text-gray-900 placeholder-gray-500 transition focus:w-48 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 sm:w-40 sm:focus:w-56"
+        placeholder="Tìm đội..."
+        className="w-28 rounded-lg border border-gray-300 bg-gray-100 px-2 py-1.5 text-sm text-gray-900 placeholder-gray-500 transition focus:w-36 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 sm:w-40 sm:focus:w-56"
       />
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg sm:w-64 dark:border-gray-700 dark:bg-gray-800">
           {loading ? (
             <p className="px-4 py-3 text-sm text-gray-500">Đang tìm...</p>
           ) : results.length === 0 ? (

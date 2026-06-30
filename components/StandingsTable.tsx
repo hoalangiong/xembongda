@@ -24,34 +24,34 @@ export default function StandingsTable({ standings }: StandingsTableProps) {
       <table className="w-full text-sm text-left">
         <thead className="border-b border-gray-700 text-xs uppercase text-gray-400">
           <tr>
-            <th className="px-3 py-2">#</th>
-            <th className="px-3 py-2">Đội</th>
-            <th className="px-3 py-2 text-center">Trận</th>
-            <th className="px-3 py-2 text-center">Thắng</th>
-            <th className="px-3 py-2 text-center">Hòa</th>
-            <th className="px-3 py-2 text-center">Thua</th>
-            <th className="px-3 py-2 text-center">HS</th>
-            <th className="px-3 py-2 text-center font-bold">Điểm</th>
+            <th className="px-2 py-2 sm:px-3">#</th>
+            <th className="px-2 py-2 sm:px-3">Đội</th>
+            <th className="px-2 py-2 text-center sm:px-3">Trận</th>
+            <th className="px-2 py-2 text-center sm:px-3">Thắng</th>
+            <th className="hidden px-2 py-2 text-center sm:table-cell sm:px-3">Hòa</th>
+            <th className="hidden px-2 py-2 text-center sm:table-cell sm:px-3">Thua</th>
+            <th className="hidden px-2 py-2 text-center md:table-cell sm:px-3">HS</th>
+            <th className="px-2 py-2 text-center font-bold sm:px-3">Điểm</th>
           </tr>
         </thead>
         <tbody>
           {standings.map((row) => (
             <tr key={row.team.id} className="border-b border-gray-800 hover:bg-gray-800/50">
-              <td className="px-3 py-2 text-gray-300">{row.rank}</td>
-              <td className="px-3 py-2">
+              <td className="px-2 py-2 text-gray-300 sm:px-3">{row.rank}</td>
+              <td className="px-2 py-2 sm:px-3">
                 <div className="flex items-center gap-2">
                   {row.team.logo && (
-                    <img src={row.team.logo} alt={row.team.name} className="h-5 w-5" />
+                    <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 shrink-0" />
                   )}
-                  <span className="text-white">{row.team.name}</span>
+                  <span className="truncate text-white">{row.team.name}</span>
                 </div>
               </td>
-              <td className="px-3 py-2 text-center text-gray-300">{row.all.played}</td>
-              <td className="px-3 py-2 text-center text-gray-300">{row.all.win}</td>
-              <td className="px-3 py-2 text-center text-gray-300">{row.all.draw}</td>
-              <td className="px-3 py-2 text-center text-gray-300">{row.all.lose}</td>
-              <td className="px-3 py-2 text-center text-gray-300">{row.goalsDiff}</td>
-              <td className="px-3 py-2 text-center font-bold text-white">{row.points}</td>
+              <td className="px-2 py-2 text-center text-gray-300 sm:px-3">{row.all.played}</td>
+              <td className="px-2 py-2 text-center text-gray-300 sm:px-3">{row.all.win}</td>
+              <td className="hidden px-2 py-2 text-center text-gray-300 sm:table-cell sm:px-3">{row.all.draw}</td>
+              <td className="hidden px-2 py-2 text-center text-gray-300 sm:table-cell sm:px-3">{row.all.lose}</td>
+              <td className="hidden px-2 py-2 text-center text-gray-300 md:table-cell sm:px-3">{row.goalsDiff}</td>
+              <td className="px-2 py-2 text-center font-bold text-white sm:px-3">{row.points}</td>
             </tr>
           ))}
         </tbody>

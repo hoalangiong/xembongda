@@ -51,14 +51,14 @@ export default function MatchCard({ fixture }: MatchCardProps) {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex flex-1 items-center gap-2">
+          <div className="flex flex-1 items-center gap-2 min-w-0">
             {teams.home.logo && (
-              <img src={teams.home.logo} alt={teams.home.name} className="h-6 w-6" />
+              <img src={teams.home.logo} alt={teams.home.name} className="h-6 w-6 shrink-0" />
             )}
-            <span className="text-sm font-medium text-white">{teams.home.name}</span>
+            <span className="truncate text-sm font-medium text-white">{teams.home.name}</span>
           </div>
 
-          <div className="mx-4 text-center">
+          <div className="mx-2 shrink-0 text-center sm:mx-4">
             {goals.home !== null ? (
               <span className={`text-lg font-bold ${isLive ? "text-green-400" : "text-white"}`}>
                 {goals.home} - {goals.away}
@@ -71,10 +71,10 @@ export default function MatchCard({ fixture }: MatchCardProps) {
             )}
           </div>
 
-          <div className="flex flex-1 items-center justify-end gap-2">
-            <span className="text-sm font-medium text-white">{teams.away.name}</span>
+          <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
+            <span className="truncate text-sm font-medium text-white">{teams.away.name}</span>
             {teams.away.logo && (
-              <img src={teams.away.logo} alt={teams.away.name} className="h-6 w-6" />
+              <img src={teams.away.logo} alt={teams.away.name} className="h-6 w-6 shrink-0" />
             )}
           </div>
         </div>
