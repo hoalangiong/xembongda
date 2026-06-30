@@ -24,8 +24,8 @@ export default function MatchDetail() {
         if (data.data?.[0]) {
           setMatch(data.data[0]);
         } else {
-          // 2. Fallback: tìm trong World Cup (odds-api.io)
-          const wcRes = await fetch(apiUrl("/api/worldcup"));
+          // 2. Fallback: tìm trong World Cup (tất cả status)
+          const wcRes = await fetch(apiUrl("/api/worldcup?status=all"));
           const wcData = await wcRes.json();
           const found = (wcData.data || []).find(
             (f: any) => String(f.fixture.id) === id
@@ -44,27 +44,42 @@ export default function MatchDetail() {
     return <p className="text-gray-400">Đang tải...</p>;
   }
 
-  // Fallback: World Cup match từ odds-api.io (chỉ có tên đội + kèo)
+  // Fallback: World Cup match từ odds-api.io
   if (!match && wcMatch) {
+    const isFinished = wcMatch.fixture.status.short === "FT";
     return (
       <div className="space-y-6">
         <div className="rounded-lg bg-gray-100 p-6 text-center dark:bg-gray-800">
           <p className="text-sm text-gray-500 dark:text-gray-400">{wcMatch.league.name}</p>
           <div className="mt-4 flex items-center justify-center gap-6">
             <div className="flex flex-col items-center gap-2">
-              <span className="text-3xl">🏠</span>
+              {wcMatch.teams.home.logo ? (
+                <img src={wcMatch.teams.home.logo} alt={wcMatch.teams.home.name} className="h-10 w-10" />
+              ) : (
+                <span className="text-3xl">🏠</span>
+              )}
               <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.home.name}</span>
             </div>
             <div className="text-center">
-              <p className="text-xl text-gray-500">vs</p>
+              {wcMatch.goals.home !== null ? (
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {wcMatch.goals.home} - {wcMatch.goals.away}
+                </p>
+              ) : (
+                <p className="text-xl text-gray-500">vs</p>
+              )}
               <p className="mt-1 text-xs text-gray-400">
-                {new Date(wcMatch.fixture.date).toLocaleDateString("vi-VN", {
+                {isFinished ? "Kết thúc" : new Date(wcMatch.fixture.date).toLocaleDateString("vi-VN", {
                   weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
                 })}
               </p>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <span className="text-3xl">✈️</span>
+              {wcMatch.teams.away.logo ? (
+                <img src={wcMatch.teams.away.logo} alt={wcMatch.teams.away.name} className="h-10 w-10" />
+              ) : (
+                <span className="text-3xl">✈️</span>
+              )}
               <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.away.name}</span>
             </div>
           </div>
