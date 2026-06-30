@@ -7,6 +7,12 @@ import type { SportSrcStream } from "@/lib/sportsrc";
 import { apiUrl } from "@/lib/utils";
 import MatchOdds from "@/components/MatchOdds";
 
+// VTVGo channels phát World Cup
+const VTVGO_SOURCES = [
+  { streamNo: 0, language: "VTV3 - Tiếng Việt", hd: true, embedUrl: "https://vtvgo.vn/channel/vtv3-1,3.html", id: "vtvgo-vtv3", source: "vtvgo" },
+  { streamNo: 0, language: "VTV6 - Tiếng Việt", hd: true, embedUrl: "https://vtvgo.vn/channel/vtv6-1,13.html", id: "vtvgo-vtv6", source: "vtvgo" },
+];
+
 export default function TrucTiepPage() {
   const params = useParams();
   const id = params.id as string;
@@ -44,15 +50,22 @@ export default function TrucTiepPage() {
             match.teams.home.name,
             match.teams.away.name
           );
+          let allStreams: SportSrcStream[] = [];
+          // Thêm VTVGo lên đầu (World Cup có bản quyền trên VTV)
+          allStreams.push(...VTVGO_SOURCES as unknown as SportSrcStream[]);
           if (srcMatch) {
             const srcStreams = await getSportSrcStreams(srcMatch.id);
-            const sorted = srcStreams.sort((a, b) => {
-              if (a.hd && !b.hd) return -1;
-              if (!a.hd && b.hd) return 1;
-              return a.streamNo - b.streamNo;
-            });
-            setStreams(sorted);
+            allStreams.push(...srcStreams);
           }
+          // Sort: VTVGo trước, rồi HD trước SD
+          const sorted = allStreams.sort((a, b) => {
+            if (a.source === "vtvgo" && b.source !== "vtvgo") return -1;
+            if (a.source !== "vtvgo" && b.source === "vtvgo") return 1;
+            if (a.hd && !b.hd) return -1;
+            if (!a.hd && b.hd) return 1;
+            return a.streamNo - b.streamNo;
+          });
+          setStreams(sorted);
         }
       } catch {
         setFixture(null);
