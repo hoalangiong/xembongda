@@ -7,10 +7,10 @@ import type { SportSrcStream } from "@/lib/sportsrc";
 import { apiUrl } from "@/lib/utils";
 import MatchOdds from "@/components/MatchOdds";
 
-// VTVGo channels phát World Cup
-const VTVGO_SOURCES = [
-  { streamNo: 0, language: "VTV3 - Tiếng Việt", hd: true, embedUrl: "https://vtvgo.vn/channel/vtv3-1,3.html", id: "vtvgo-vtv3", source: "vtvgo" },
-  { streamNo: 0, language: "VTV6 - Tiếng Việt", hd: true, embedUrl: "https://vtvgo.vn/channel/vtv6-1,13.html", id: "vtvgo-vtv6", source: "vtvgo" },
+// VTVGo channels - mở tab mới vì iframe bị chặn interaction
+const VTVGO_LINKS = [
+  { name: "VTV3 - Tiếng Việt", url: "https://vtvgo.vn/channel/vtv3-1,3.html" },
+  { name: "VTV6 - Tiếng Việt", url: "https://vtvgo.vn/channel/vtv6-1,13.html" },
 ];
 
 export default function TrucTiepPage() {
@@ -50,22 +50,15 @@ export default function TrucTiepPage() {
             match.teams.home.name,
             match.teams.away.name
           );
-          let allStreams: SportSrcStream[] = [];
-          // Thêm VTVGo lên đầu (World Cup có bản quyền trên VTV)
-          allStreams.push(...VTVGO_SOURCES as unknown as SportSrcStream[]);
           if (srcMatch) {
             const srcStreams = await getSportSrcStreams(srcMatch.id);
-            allStreams.push(...srcStreams);
+            const sorted = srcStreams.sort((a, b) => {
+              if (a.hd && !b.hd) return -1;
+              if (!a.hd && b.hd) return 1;
+              return a.streamNo - b.streamNo;
+            });
+            setStreams(sorted);
           }
-          // Sort: VTVGo trước, rồi HD trước SD
-          const sorted = allStreams.sort((a, b) => {
-            if (a.source === "vtvgo" && b.source !== "vtvgo") return -1;
-            if (a.source !== "vtvgo" && b.source === "vtvgo") return 1;
-            if (a.hd && !b.hd) return -1;
-            if (!a.hd && b.hd) return 1;
-            return a.streamNo - b.streamNo;
-          });
-          setStreams(sorted);
         }
       } catch {
         setFixture(null);
@@ -102,6 +95,21 @@ export default function TrucTiepPage() {
 
       <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
         <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">📺 Xem trực tiếp</h2>
+
+        {/* VTVGo - mở tab mới */}
+        <div className="mb-3 flex flex-wrap gap-2">
+          {VTVGO_LINKS.map((vtv) => (
+            <a
+              key={vtv.name}
+              href={vtv.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-red-600 px-3 py-1 text-sm font-medium text-white transition hover:bg-red-700"
+            >
+              📡 {vtv.name}
+            </a>
+          ))}
+        </div>
 
         {streams.length > 0 ? (
           <>
