@@ -17,6 +17,13 @@ const VN_BOOKMAKERS = [
   { name: "SC88", logo: "🔵", link: "https://www.sc887.vip/?id=264720333" },
 ];
 
+// Format odds: bỏ trailing zero (1.970 → 1.97, 2.000 → 2.00)
+function fmtOdds(val: string | number): string {
+  const n = parseFloat(String(val));
+  if (isNaN(n)) return "-";
+  return n % 1 === 0 ? n.toFixed(1) : parseFloat(n.toFixed(2)).toString();
+}
+
 export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsProps) {
   const [oddsData, setOddsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -89,11 +96,11 @@ export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsPr
                   return (
                     <tr key={name} className="border-b border-gray-200 dark:border-gray-700">
                       <td className="px-3 py-2 font-medium text-gray-700 dark:text-gray-300">{label}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{mainLine.home}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(mainLine.home)}</td>
                       <td className="px-3 py-2 text-center text-xs font-bold text-yellow-600 dark:text-yellow-400">
                         {mainLine.hdp > 0 ? `+${mainLine.hdp}` : mainLine.hdp}
                       </td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{mainLine.away}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(mainLine.away)}</td>
                       <td className="px-3 py-2"></td>
                     </tr>
                   );
@@ -106,11 +113,11 @@ export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsPr
                   return VN_BOOKMAKERS.map((vn) => (
                     <tr key={vn.name} className="border-b border-gray-200 dark:border-gray-700">
                       <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{vn.logo} {vn.name}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{line.home}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(line.home)}</td>
                       <td className="px-3 py-2 text-center text-xs font-bold text-yellow-600 dark:text-yellow-400">
                         {line.hdp > 0 ? `+${line.hdp}` : line.hdp}
                       </td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{line.away}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(line.away)}</td>
                       <td className="px-3 py-2 text-center">
                         <a href={vn.link} target="_blank" rel="noopener noreferrer"
                           className="rounded bg-green-600 px-2 py-1 text-xs font-medium text-white hover:bg-green-700">
@@ -147,9 +154,9 @@ export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsPr
                   return (
                     <tr key={name} className="border-b border-gray-200 dark:border-gray-700">
                       <td className="px-3 py-2 font-medium text-gray-700 dark:text-gray-300">{label}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{mainLine.over}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(mainLine.over)}</td>
                       <td className="px-3 py-2 text-center text-xs font-bold text-yellow-600 dark:text-yellow-400">{mainLine.hdp}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{mainLine.under}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(mainLine.under)}</td>
                     </tr>
                   );
                 })}
@@ -161,9 +168,9 @@ export default function MatchOdds({ fixtureId, homeTeam, awayTeam }: MatchOddsPr
                   return VN_BOOKMAKERS.map((vn) => (
                     <tr key={vn.name} className="border-b border-gray-200 dark:border-gray-700">
                       <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{vn.logo} {vn.name}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{line.over}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(line.over)}</td>
                       <td className="px-3 py-2 text-center text-xs font-bold text-yellow-600 dark:text-yellow-400">{line.hdp}</td>
-                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{line.under}</td>
+                      <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">{fmtOdds(line.under)}</td>
                     </tr>
                   ));
                 })()}
