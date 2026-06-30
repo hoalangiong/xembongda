@@ -23,7 +23,8 @@ function parseRSS(xml: string, source: string): NewsItem[] {
     const title = content.match(/<title>(.*?)<\/title>/)?.[1] || "";
     const link = content.match(/<link>(.*?)<\/link>/)?.[1] || "";
     const pubDate = content.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || "";
-    const image = content.match(/url="([^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)?.[1] || "";
+    const rawImage = content.match(/url="([^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)?.[1] || "";
+    const image = rawImage.replace(/&amp;/g, "&");
 
     // Chỉ lấy tin liên quan bóng đá
     const keywords = ["world cup", "bóng đá", "bàn thắng", "trận", "đội tuyển", "ngoại hạng", "la liga", "champions", "giải", "huấn luyện", "cầu thủ", "tỷ số", "vòng", "luân lưu", "penalty"];
