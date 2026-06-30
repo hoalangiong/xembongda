@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getOddsEvents } from "@/lib/odds-api";
 
 // Map tên quốc gia → mã ISO 2 ký tự để lấy cờ từ flagcdn.com
@@ -31,16 +31,24 @@ function getFlagUrl(country: string): string {
   return `https://flagcdn.com/w80/${code}.png`;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status") || "pending"; // pending | settled | live | all
+
     const events = await getOddsEvents("international-fifa-world-cup");
 
-    const fixtures = events
-      .filter((e: any) => e.status === "pending")
-      .map((e: any) => ({
+    const filtered = status === "all"
+      ? events
+      : events.filter((e: any) => e.status === status);
+
+    const fixtures = filtered.map((e: any) => {
+      const isSettled = e.status === "settled";
+      const isLive = e.status === "live";
+      return {
         fixture: {
           id: e.id,
-          status: { short: "NS", elapsed: null },
+          status: { short: isSettled ? "FT" : isLive ? "LIVE" : "NS", elapsed: null },
           date: e.date,
         },
         league: { id: 1, name: "World Cup 2026", logo: "https://flagcdn.com/w80/un.png" },
@@ -48,8 +56,12 @@ export async function GET() {
           home: { name: e.home, logo: getFlagUrl(e.home) },
           away: { name: e.away, logo: getFlagUrl(e.away) },
         },
-        goals: { home: null, away: null },
-      }));
+        goals: {
+          home: isSettled ? (e.scores?.home ?? null) : null,
+          away: isSettled ? (e.scores?.away ?? null) : null,
+        },
+      };
+    });
 
     return NextResponse.json({ data: fixtures });
   } catch {

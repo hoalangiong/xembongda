@@ -7,6 +7,7 @@ import { apiUrl } from "@/lib/utils";
 
 export default function KetQuaContent() {
   const [fixtures, setFixtures] = useState<any[]>([]);
+  const [wcResults, setWcResults] = useState<any[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<number | null>(null);
   const [date, setDate] = useState(() => {
     const yesterday = new Date();
@@ -19,16 +20,20 @@ export default function KetQuaContent() {
     async function fetchData() {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ date });
-        if (selectedLeague) params.set("league", String(selectedLeague));
-        const res = await fetch(apiUrl(`/api/fixtures?${params}`));
-        const data = await res.json();
-        const finished = (data.data || []).filter(
+        const [fixturesRes, wcRes] = await Promise.all([
+          fetch(apiUrl(`/api/fixtures?date=${date}${selectedLeague ? `&league=${selectedLeague}` : ""}`)),
+          fetch(apiUrl("/api/worldcup?status=settled")),
+        ]);
+        const fixturesData = await fixturesRes.json();
+        const wcData = await wcRes.json();
+        const finished = (fixturesData.data || []).filter(
           (f: any) => f.fixture.status.short === "FT"
         );
         setFixtures(finished);
+        setWcResults(wcData.data || []);
       } catch {
         setFixtures([]);
+        setWcResults([]);
       }
       setLoading(false);
     }
@@ -52,14 +57,28 @@ export default function KetQuaContent() {
 
       {loading ? (
         <p className="text-gray-400">Đang tải...</p>
-      ) : fixtures.length === 0 ? (
-        <p className="text-gray-400">Không có kết quả nào trong ngày này.</p>
+      ) : fixtures.length === 0 && wcResults.length === 0 ? (
+        <p className="text-gray-400">Không có kết quả nào.</p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {fixtures.map((f: any) => (
-            <MatchCard key={f.fixture.id} fixture={f} />
-          ))}
-        </div>
+        <>
+          {wcResults.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🏆 World Cup 2026</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {wcResults.map((f: any) => (
+                  <MatchCard key={f.fixture.id} fixture={f} />
+                ))}
+              </div>
+            </div>
+          )}
+          {fixtures.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {fixtures.map((f: any) => (
+                <MatchCard key={f.fixture.id} fixture={f} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
