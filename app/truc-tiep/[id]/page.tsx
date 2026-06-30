@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { getSportSrcMatches, getSportSrcStreams, findSportSrcMatch } from "@/lib/sportsrc";
 import type { SportSrcStream } from "@/lib/sportsrc";
 import { apiUrl } from "@/lib/utils";
+import MatchOdds from "@/components/MatchOdds";
 
 export default function TrucTiepPage() {
   const params = useParams();
@@ -20,12 +21,22 @@ export default function TrucTiepPage() {
         // 1. Lấy thông tin trận từ API-Football
         const res = await fetch(apiUrl(`/api/fixtures?live=true`));
         const data = await res.json();
-        const match = (data.data || []).find(
+        let match = (data.data || []).find(
           (f: any) => String(f.fixture.id) === id
         );
+
+        // 2. Fallback: tìm trong World Cup (odds-api.io)
+        if (!match) {
+          const wcRes = await fetch(apiUrl("/api/worldcup"));
+          const wcData = await wcRes.json();
+          match = (wcData.data || []).find(
+            (f: any) => String(f.fixture.id) === id
+          );
+        }
+
         setFixture(match || null);
 
-        // 2. Tìm stream từ SportSRC
+        // 3. Tìm stream từ SportSRC
         if (match) {
           const srcMatches = await getSportSrcMatches();
           const srcMatch = findSportSrcMatch(
@@ -35,7 +46,6 @@ export default function TrucTiepPage() {
           );
           if (srcMatch) {
             const srcStreams = await getSportSrcStreams(srcMatch.id);
-            // Lọc HD sources ưu tiên
             const sorted = srcStreams.sort((a, b) => {
               if (a.hd && !b.hd) return -1;
               if (!a.hd && b.hd) return 1;
@@ -121,6 +131,11 @@ export default function TrucTiepPage() {
           </div>
         )}
       </div>
+
+      {/* Kèo châu Á */}
+      {fixture && (
+        <MatchOdds fixtureId={Number(id)} homeTeam={fixture.teams.home.name} awayTeam={fixture.teams.away.name} />
+      )}
     </div>
   );
 }
