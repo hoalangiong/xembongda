@@ -7,6 +7,7 @@ import MatchTimeline from "./MatchTimeline";
 import MatchStats from "./MatchStats";
 import MatchLineup from "./MatchLineup";
 import MatchOdds from "./MatchOdds";
+import MatchHeader from "./MatchHeader";
 
 export default function MatchDetail() {
   const params = useParams();
@@ -47,44 +48,22 @@ export default function MatchDetail() {
   // Fallback: World Cup match từ odds-api.io
   if (!match && wcMatch) {
     const isFinished = wcMatch.fixture.status.short === "FT";
+    const kickoff = new Date(wcMatch.fixture.date);
     return (
-      <div className="space-y-6">
-        <div className="rounded-lg bg-gray-100 p-6 text-center dark:bg-gray-800">
-          <p className="text-sm text-gray-500 dark:text-gray-400">{wcMatch.league.name}</p>
-          <div className="mt-4 flex items-center justify-center gap-6">
-            <div className="flex flex-col items-center gap-2">
-              {wcMatch.teams.home.logo ? (
-                <img src={wcMatch.teams.home.logo} alt={wcMatch.teams.home.name} className="h-10 w-10" />
-              ) : (
-                <span className="text-3xl">🏠</span>
-              )}
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.home.name}</span>
-            </div>
-            <div className="text-center">
-              {wcMatch.goals.home !== null ? (
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {wcMatch.goals.home} - {wcMatch.goals.away}
-                </p>
-              ) : (
-                <p className="text-xl text-gray-500">vs</p>
-              )}
-              <p className="mt-1 text-xs text-gray-400">
-                {isFinished ? "Kết thúc" : new Date(wcMatch.fixture.date).toLocaleDateString("vi-VN", {
-                  weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
-                })}
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              {wcMatch.teams.away.logo ? (
-                <img src={wcMatch.teams.away.logo} alt={wcMatch.teams.away.name} className="h-10 w-10" />
-              ) : (
-                <span className="text-3xl">✈️</span>
-              )}
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{wcMatch.teams.away.name}</span>
-            </div>
-          </div>
-        </div>
-
+      <div className="mx-auto max-w-3xl space-y-4">
+        <MatchHeader
+          leagueName={wcMatch.league.name}
+          leagueLogo={wcMatch.league.logo}
+          homeName={wcMatch.teams.home.name}
+          homeLogo={wcMatch.teams.home.logo}
+          awayName={wcMatch.teams.away.name}
+          awayLogo={wcMatch.teams.away.logo}
+          homeGoals={wcMatch.goals.home}
+          awayGoals={wcMatch.goals.away}
+          statusText={isFinished ? "Kết thúc" : "Chưa diễn ra"}
+          kickoff={kickoff}
+          isFinished={isFinished}
+        />
         <MatchOdds fixtureId={wcMatch.fixture.id} homeTeam={wcMatch.teams.home.name} awayTeam={wcMatch.teams.away.name} />
       </div>
     );
@@ -95,56 +74,28 @@ export default function MatchDetail() {
   }
 
   const { fixture, league, teams, goals, events, statistics, lineups } = match;
+  const status = fixture.status.short;
+  const isLive = ["1H", "2H", "HT", "ET", "P", "LIVE"].includes(status);
+  const isFinishedMatch = status === "FT";
 
   return (
-    <div className="space-y-6">
-      {/* Header trận đấu */}
-      <div className="rounded-lg bg-gray-800 p-6 text-center">
-        <p className="text-sm text-gray-400">{league?.name} — {league?.round}</p>
-        <div className="mt-4 flex items-center justify-center gap-6">
-          <div className="flex flex-col items-center gap-2">
-            {teams.home.logo && (
-              <img src={teams.home.logo} alt={teams.home.name} className="h-12 w-12" />
-            )}
-            <span className="text-sm font-medium">{teams.home.name}</span>
-          </div>
-
-          <div className="text-center">
-            {goals.home !== null ? (
-              <p className="text-3xl font-bold text-white">
-                {goals.home} - {goals.away}
-              </p>
-            ) : (
-              <p className="text-xl text-gray-500">vs</p>
-            )}
-            <p className="mt-1 text-xs text-gray-400">
-              {fixture.status.long}
-              {fixture.status.elapsed && ` — ${fixture.status.elapsed}'`}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-2">
-            {teams.away.logo && (
-              <img src={teams.away.logo} alt={teams.away.name} className="h-12 w-12" />
-            )}
-            <span className="text-sm font-medium">{teams.away.name}</span>
-          </div>
-        </div>
-
-        <p className="mt-3 text-xs text-gray-500">
-          {new Date(fixture.date).toLocaleDateString("vi-VN", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
-        {fixture.venue?.name && (
-          <p className="text-xs text-gray-500">📍 {fixture.venue.name}, {fixture.venue.city}</p>
-        )}
-      </div>
+    <div className="mx-auto max-w-3xl space-y-4">
+      <MatchHeader
+        leagueName={`${league?.name}${league?.round ? " — " + league.round : ""}`}
+        leagueLogo={league?.logo}
+        homeName={teams.home.name}
+        homeLogo={teams.home.logo}
+        awayName={teams.away.name}
+        awayLogo={teams.away.logo}
+        homeGoals={goals.home}
+        awayGoals={goals.away}
+        statusText={fixture.status.long}
+        kickoff={new Date(fixture.date)}
+        isFinished={isFinishedMatch}
+        isLive={isLive}
+        elapsed={fixture.status.elapsed}
+        venue={fixture.venue?.name ? `${fixture.venue.name}${fixture.venue.city ? ", " + fixture.venue.city : ""}` : undefined}
+      />
 
       {/* Tỷ lệ kèo */}
       <MatchOdds fixtureId={fixture.id} homeTeam={teams.home.name} awayTeam={teams.away.name} />
