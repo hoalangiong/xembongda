@@ -1,0 +1,25 @@
+{
+  "name": "XemBongDa - Lịch, kết quả & trực tiếp bóng đá",
+  "short_name": "XemBongDa",
+  "description": "Xem lịch thi đấu, kết quả, bảng xếp hạng và trực tiếp bóng đá World Cup, Ngoại hạng Anh, La Liga, Bundesliga, Serie A.",
+  "start_url": "/bongda",
+  "scope": "/bongda",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/bongda/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/bongda/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

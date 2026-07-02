@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRef, useState, useEffect } from "react";
 import LiveBadge from "./LiveBadge";
 import NotifyBell from "./NotifyBell";
 
@@ -31,8 +34,23 @@ export default function MatchCard({ fixture }: MatchCardProps) {
   const isFinished = info.status.short === "FT";
   const href = isLive ? `/truc-tiep/${info.id}` : `/tran-dau/${info.id}`;
 
+  // Flash hiệu ứng khi tỷ số thay đổi
+  const [flash, setFlash] = useState(false);
+  const prevScore = useRef<string>(`${goals.home}-${goals.away}`);
+
+  useEffect(() => {
+    const current = `${goals.home}-${goals.away}`;
+    if (isLive && prevScore.current !== current && goals.home !== null) {
+      setFlash(true);
+      const t = setTimeout(() => setFlash(false), 3000);
+      prevScore.current = current;
+      return () => clearTimeout(t);
+    }
+    prevScore.current = current;
+  }, [goals.home, goals.away, isLive]);
+
   return (
-    <div className="relative rounded-lg bg-gray-800 p-4 transition hover:bg-gray-750 hover:ring-1 hover:ring-green-600/50">
+    <div className={`relative rounded-lg bg-gray-800 p-4 transition hover:bg-gray-750 hover:ring-1 hover:ring-green-600/50 ${flash ? "ring-2 ring-green-500 animate-pulse" : ""}`}>
       <Link href={href} className="block">
         <div className="mb-2 flex items-center justify-between text-xs text-gray-400">
           <span className="flex items-center gap-1">
