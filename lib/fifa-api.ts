@@ -88,15 +88,21 @@ export async function findFifaMatch(homeTeam: string, awayTeam: string): Promise
 
   const homeNorm = normalize(homeTeam);
   const awayNorm = normalize(awayTeam);
+  if (!homeNorm || !awayNorm) return null;
 
   for (const match of matches) {
-    const homeName = match.HomeTeam?.TeamName?.[0]?.Description || "";
-    const awayName = match.AwayTeam?.TeamName?.[0]?.Description || "";
+    // FIFA API dùng field Home/Away, tên đội trong TeamName[].Description
+    const homeName = match.Home?.TeamName?.[0]?.Description || "";
+    const awayName = match.Away?.TeamName?.[0]?.Description || "";
     const h = normalize(homeName);
     const a = normalize(awayName);
+    // Bỏ qua match không có tên đội (tránh so khớp chuỗi rỗng)
+    if (!h || !a) continue;
 
-    if ((h.includes(homeNorm) || homeNorm.includes(h)) &&
-        (a.includes(awayNorm) || awayNorm.includes(a))) {
+    const homeMatches = h === homeNorm || h.includes(homeNorm) || homeNorm.includes(h);
+    const awayMatches = a === awayNorm || a.includes(awayNorm) || awayNorm.includes(a);
+
+    if (homeMatches && awayMatches) {
       return { matchId: match.IdMatch, stageId: match.IdStage };
     }
   }

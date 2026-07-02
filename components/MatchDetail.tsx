@@ -7,7 +7,6 @@ import MatchTimeline from "./MatchTimeline";
 import MatchStats from "./MatchStats";
 import MatchLineup from "./MatchLineup";
 import MatchOdds from "./MatchOdds";
-import FifaTimeline from "./FifaTimeline";
 
 export default function MatchDetail() {
   const params = useParams();
@@ -86,7 +85,6 @@ export default function MatchDetail() {
           </div>
         </div>
 
-        <FifaTimeline homeTeam={wcMatch.teams.home.name} awayTeam={wcMatch.teams.away.name} />
         <MatchOdds fixtureId={wcMatch.fixture.id} homeTeam={wcMatch.teams.home.name} awayTeam={wcMatch.teams.away.name} />
       </div>
     );

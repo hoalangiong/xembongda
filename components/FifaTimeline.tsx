@@ -6,6 +6,7 @@ import { apiUrl } from "@/lib/utils";
 interface FifaTimelineProps {
   homeTeam: string;
   awayTeam: string;
+  matchDate?: string;
 }
 
 interface MatchEvent {
